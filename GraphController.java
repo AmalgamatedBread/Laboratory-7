@@ -2,48 +2,51 @@ package com.Segovia.Lab_7.controller;
 
 import com.Segovia.Lab_7.model.Product;
 import com.Segovia.Lab_7.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 public class GraphController {
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
     @QueryMapping
-    public ArrayList<Product> getAllProducts() {
+    public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @QueryMapping
-    public Product getProduct(@Argument Long id) {
-        return productService.getProductById(id).orElse(null);
+    public Optional<Product> getProduct(@Argument Long id) {
+        return productService.getProductById(id);
     }
 
     @MutationMapping
     public Product createProduct(@Argument ProductInput input) {
-        Product product = new Product();
-        product.setName(input.name());
-        product.setPrice(input.price());
+        Product product = Product.builder()
+                .name(input.name())
+                .price(input.price())
+                .build();
         return productService.createProduct(product);
     }
 
     @MutationMapping
-    public Product updateProduct(@Argument Long id, @Argument ProductInput input) {
-        Product productDetails = new Product();
-        productDetails.setName(input.name());
-        productDetails.setPrice(input.price());
-        return productService.updateProduct(id, productDetails).orElse(null);
+    public Optional<Product> updateProduct(@Argument Long id, @Argument ProductInput input) {
+        Product productDetails = Product.builder()
+                .name(input.name())
+                .price(input.price())
+                .build();
+        return productService.updateProduct(id, productDetails);
     }
 
     @MutationMapping
-    public Boolean deleteProduct(@Argument Long id) {
+    public boolean deleteProduct(@Argument Long id) {
         return productService.deleteProduct(id);
     }
 
